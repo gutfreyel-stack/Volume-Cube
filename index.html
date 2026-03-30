@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cube Volume</title>
+  <style>
+    :root {
+      --bg: #2f2f31;
+      --panel: #303033;
+      --text: #f3f3f3;
+      --muted: #cfcfcf;
+      --line: #f0f0f0;
+      --track: #3b3b3f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #1f1f21;
+      font-family: "Georgia", "Times New Roman", serif;
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+    }
+
+    .app {
+      width: 960px;
+      height: 340px;
+      background: var(--bg);
+      border-radius: 6px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .left,
+    .right {
+      position: relative;
+      padding: 28px 32px;
+      background: var(--panel);
+    }
+
+    .left {
+      border-right: 1px solid #3a3a3d;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .formula {
+      text-align: center;
+      font-size: 28px;
+      font-style: italic;
+      margin-top: 48px;
+      letter-spacing: 0.5px;
+    }
+
+    .controls {
+      margin-top: auto;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .slider-label {
+      font-size: 22px;
+      font-style: italic;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 10px;
+      background: var(--track);
+      border-radius: 999px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #1f1f21;
+      border: 1px solid #555;
+      cursor: pointer;
+      margin-top: -5px;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #1f1f21;
+      border: 1px solid #555;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--track);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--track);
+    }
+
+    .value-line,
+    .result-line {
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    .right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cube-wrap {
+      text-align: center;
+      transform: translateY(-6px);
+    }
+
+    .cube-svg {
+      overflow: visible;
+    }
+
+    .cube-label {
+      margin-top: 6px;
+      font-size: 18px;
+    }
+
+    .dashed-line {
+      stroke-dasharray: 5 5;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        width: 100%;
+        height: auto;
+        grid-template-columns: 1fr;
+      }
+
+      .left {
+        border-right: none;
+        border-bottom: 1px solid #3a3a3d;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="left">
+      <div class="formula" id="formula">V = s³</div>
+
+      <div class="controls">
+        <div class="slider-row">
+          <div class="slider-label">s</div>
+          <input
+            id="sideSlider"
+            type="range"
+            min="0.5"
+            max="5"
+            step="0.1"
+            value="1"
+          />
+        </div>
+
+        <div class="value-line" id="sideValue">s = 1.0</div>
+        <div class="result-line" id="result">V = s³ ≈ 1.00</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="cube-wrap">
+        <svg class="cube-svg" width="220" height="180" viewBox="0 0 220 180">
+          <defs>
+            <linearGradient id="frontFace" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f7f7f7" />
+              <stop offset="55%" stop-color="#b7b7b7" />
+              <stop offset="100%" stop-color="#5f5f5f" />
+            </linearGradient>
+          </defs>
+
+          <!-- front -->
+          <rect
+            id="frontFaceRect"
+            x="70"
+            y="36"
+            width="70"
+            height="70"
+            fill="url(#frontFace)"
+            stroke="white"
+            stroke-width="1.5"
+          />
+
+          <!-- top -->
+          <polygon
+            id="topFace"
+            points="70,36 92,22 162,22 140,36"
+            fill="none"
+            stroke="white"
+            stroke-width="1.5"
+          />
+
+          <!-- side -->
+          <polygon
+            id="sideFace"
+            points="140,36 162,22 162,92 140,106"
+            fill="none"
+            stroke="white"
+            stroke-width="1.5"
+          />
+
+          <!-- dashed measure line -->
+          <line
+            id="measureLine"
+            class="dashed-line"
+            x1="70"
+            y1="124"
+            x2="140"
+            y2="124"
+            stroke="white"
+            stroke-width="1.3"
+          />
+          <line x1="70" y1="119" x2="70" y2="129" stroke="white" stroke-width="1.3" />
+          <line x1="140" y1="119" x2="140" y2="129" stroke="white" stroke-width="1.3" />
+
+          <text
+            id="cubeText"
+            x="105"
+            y="144"
+            text-anchor="middle"
+            fill="white"
+            font-size="16"
+          >
+            s = 1
+          </text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const slider = document.getElementById("sideSlider");
+    const sideValue = document.getElementById("sideValue");
+    const result = document.getElementById("result");
+    const cubeText = document.getElementById("cubeText");
+    const frontFaceRect = document.getElementById("frontFaceRect");
+    const topFace = document.getElementById("topFace");
+    const sideFace = document.getElementById("sideFace");
+    const measureLine = document.getElementById("measureLine");
+
+    function updateCube() {
+      const s = parseFloat(slider.value);
+      const volume = s ** 3;
+
+      sideValue.textContent = `s = ${s.toFixed(1)}`;
+      result.textContent = `V = s³ ≈ ${volume.toFixed(2)}`;
+      cubeText.textContent = `s = ${Number.isInteger(s) ? s : s.toFixed(1)}`;
+
+      // Visual scaling
+      const size = 70 + (s - 1) * 12;
+      const depth = 22 + (s - 1) * 4;
+
+      const x = 70;
+      const y = 36;
+
+      frontFaceRect.setAttribute("x", x);
+      frontFaceRect.setAttribute("y", y);
+      frontFaceRect.setAttribute("width", size);
+      frontFaceRect.setAttribute("height", size);
+
+      topFace.setAttribute(
+        "points",
+        `${x},${y} ${x + depth},${y - depth} ${x + depth + size},${y - depth} ${x + size},${y}`
+      );
+
+      sideFace.setAttribute(
+        "points",
+        `${x + size},${y} ${x + size + depth},${y - depth} ${x + size + depth},${y - depth + size} ${x + size},${y + size}`
+      );
+
+      measureLine.setAttribute("x1", x);
+      measureLine.setAttribute("x2", x + size);
+      cubeText.setAttribute("x", x + size / 2);
+    }
+
+    slider.addEventListener("input", updateCube);
+    updateCube();
+  </script>
+</body>
+</html>
